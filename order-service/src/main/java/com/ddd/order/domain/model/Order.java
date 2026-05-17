@@ -60,11 +60,14 @@ public class Order extends AggregateRoot<OrderId> {
             throw new DomainException("ORDER_EMPTY", "订单必须包含至少一个商品");
         }
         this.submitted = true;
-        return new OrderSubmittedEvent(getId(), this.customerId, this.totalAmount, this.createdAt);
+        return new OrderSubmittedEvent(getId(), this.customerId, this.totalAmount, Instant.now());
     }
 
     /** 标记已支付 */
     public OrderPaidEvent markPaid() {
+        if (!submitted) {
+            throw new DomainException("ORDER_NOT_SUBMITTED", "订单尚未提交");
+        }
         if (this.status != OrderStatus.PENDING) {
             throw new DomainException("INVALID_STATUS",
                     "只能支付待处理的订单，当前状态: " + this.status);
@@ -75,6 +78,9 @@ public class Order extends AggregateRoot<OrderId> {
 
     /** 取消订单 */
     public OrderCancelledEvent cancel() {
+        if (!submitted) {
+            throw new DomainException("ORDER_NOT_SUBMITTED", "订单尚未提交");
+        }
         if (this.status != OrderStatus.PENDING) {
             throw new DomainException("INVALID_STATUS",
                     "只能取消待处理的订单，当前状态: " + this.status);
