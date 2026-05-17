@@ -34,7 +34,16 @@ public class OrderRepositoryImpl implements OrderRepository {
         if (order.getId() != null) {
             entity.setId(order.getId().value());
         }
-        jpaRepository.save(entity);
+        OrderJpaEntity saved = jpaRepository.save(entity);
+        if (order.getId() == null && saved.getId() != null) {
+            try {
+                Field idField = AggregateRoot.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(order, new OrderId(saved.getId()));
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to set generated ID on Order", e);
+            }
+        }
     }
 
     @Override
@@ -71,7 +80,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
             Field submittedField = Order.class.getDeclaredField("submitted");
             submittedField.setAccessible(true);
-            submittedField.setBoolean(order, true);
+            submittedField.setBoolean(order, OrderStatus.valueOf(entity.getStatus()) != OrderStatus.PENDING);
 
             Field createdAtField = Order.class.getDeclaredField("createdAt");
             createdAtField.setAccessible(true);

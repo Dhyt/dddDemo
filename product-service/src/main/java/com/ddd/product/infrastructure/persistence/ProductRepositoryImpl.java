@@ -30,7 +30,11 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public void save(Product product) {
-        jpaRepository.save(toJpa(product));
+        ProductJpaEntity entity = toJpa(product);
+        ProductJpaEntity saved = jpaRepository.save(entity);
+        if (product.getId() == null && saved.getId() != null) {
+            product.setId(saved.getId());
+        }
     }
 
     @Override

@@ -33,7 +33,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         if (payment.getId() != null) {
             entity.setId(payment.getId().value());
         }
-        jpaRepository.save(entity);
+        PaymentJpaEntity saved = jpaRepository.save(entity);
+        if (payment.getId() == null && saved.getId() != null) {
+            payment.setId(saved.getId());
+        }
     }
 
     @Override
