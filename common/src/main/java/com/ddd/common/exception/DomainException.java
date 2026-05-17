@@ -14,6 +14,11 @@ public class DomainException extends RuntimeException {
         this.code = code;
     }
 
+    public DomainException(String code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
     public DomainException(String message) {
         this("DOMAIN_ERROR", message);
     }
