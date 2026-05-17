@@ -37,11 +37,11 @@ public class Product extends AggregateRoot<ProductId> {
         if (this.status != ProductStatus.ACTIVE) {
             throw new DomainException("PRODUCT_INACTIVE", "商品已下架，不可操作库存");
         }
-        if (stock.availableQuantity() - stock.reservedQuantity() < quantity) {
-            throw new DomainException("INSUFFICIENT_STOCK",
-                    "库存不足: 可用 " + (stock.availableQuantity() - stock.reservedQuantity()) + ", 需要 " + quantity);
+        try {
+            this.stock = stock.reserve(quantity);
+        } catch (IllegalArgumentException e) {
+            throw new DomainException("INVALID_RESERVE", e.getMessage());
         }
-        this.stock = stock.reserve(quantity);
         if (stock.availableQuantity() - stock.reservedQuantity() == 0) {
             this.status = ProductStatus.OUT_OF_STOCK;
         }
