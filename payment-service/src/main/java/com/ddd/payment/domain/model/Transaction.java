@@ -9,7 +9,7 @@ import java.time.Instant;
  * DDD: Entity — 有唯一标识，记录不可修改，只能追加。
  */
 public class Transaction {
-    private Long transactionId;
+    private TransactionId transactionId;
     private final String type;   // PAYMENT, REFUND
     private final BigDecimal amount;
     private final String status;
@@ -22,8 +22,8 @@ public class Transaction {
         this.createdAt = Instant.now();
     }
 
-    public Long getTransactionId() { return transactionId; }
-    public void setTransactionId(Long id) { this.transactionId = id; }
+    public TransactionId getTransactionId() { return transactionId; }
+    public void setTransactionId(TransactionId id) { this.transactionId = id; }
     public String getType() { return type; }
     public BigDecimal getAmount() { return amount; }
     public String getStatus() { return status; }

@@ -68,6 +68,7 @@ public class Payment extends AggregateRoot<PaymentId> {
     }
 
     public void setMethod(PaymentMethod method) { this.method = method; }
+    public void setId(Long id) { super.setId(new PaymentId(id)); }
 
     // Getters
     public Long getOrderId() { return orderId; }
