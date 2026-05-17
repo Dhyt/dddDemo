@@ -9,13 +9,16 @@ import java.time.Instant;
  * DDD: Entity — 有唯一标识，记录不可修改，只能追加。
  */
 public class Transaction {
+    public enum TransactionType { PAYMENT, REFUND }
+    public enum TransactionStatus { SUCCESS, FAILED }
+
     private TransactionId transactionId;
-    private final String type;   // PAYMENT, REFUND
+    private final TransactionType type;
     private final BigDecimal amount;
-    private final String status;
+    private final TransactionStatus status;
     private final Instant createdAt;
 
-    public Transaction(String type, BigDecimal amount, String status) {
+    public Transaction(TransactionType type, BigDecimal amount, TransactionStatus status) {
         this.type = type;
         this.amount = amount;
         this.status = status;
@@ -24,8 +27,8 @@ public class Transaction {
 
     public TransactionId getTransactionId() { return transactionId; }
     public void setTransactionId(TransactionId id) { this.transactionId = id; }
-    public String getType() { return type; }
+    public TransactionType getType() { return type; }
     public BigDecimal getAmount() { return amount; }
-    public String getStatus() { return status; }
+    public TransactionStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }
 }

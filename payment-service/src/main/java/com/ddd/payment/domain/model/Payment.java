@@ -44,16 +44,17 @@ public class Payment extends AggregateRoot<PaymentId> {
                     "当前支付状态不可完成: " + this.status);
         }
         this.status = PaymentStatus.SUCCEEDED;
-        this.transactions.add(new Transaction("PAYMENT", amount, "SUCCESS"));
+        this.transactions.add(new Transaction(Transaction.TransactionType.PAYMENT, amount, Transaction.TransactionStatus.SUCCESS));
         return new PaymentSucceededEvent(getId(), this.orderId);
     }
 
     public PaymentFailedEvent fail(String reason) {
-        if (this.status == PaymentStatus.SUCCEEDED) {
-            throw new DomainException("INVALID_STATUS", "已成功的支付不可标记失败");
+        if (this.status != PaymentStatus.INITIATED && this.status != PaymentStatus.PROCESSING) {
+            throw new DomainException("INVALID_STATUS",
+                    "当前支付状态不可标记失败: " + this.status);
         }
         this.status = PaymentStatus.FAILED;
-        this.transactions.add(new Transaction("PAYMENT", amount, "FAILED"));
+        this.transactions.add(new Transaction(Transaction.TransactionType.PAYMENT, amount, Transaction.TransactionStatus.FAILED));
         return new PaymentFailedEvent(getId(), this.orderId, reason);
     }
 
@@ -63,11 +64,11 @@ public class Payment extends AggregateRoot<PaymentId> {
                     "只能退款已成功的支付，当前状态: " + this.status);
         }
         this.status = PaymentStatus.REFUNDED;
-        this.transactions.add(new Transaction("REFUND", amount, "SUCCESS"));
+        this.transactions.add(new Transaction(Transaction.TransactionType.REFUND, amount, Transaction.TransactionStatus.SUCCESS));
         return new PaymentRefundedEvent(getId(), this.orderId);
     }
 
-    public void setMethod(PaymentMethod method) { this.method = method; }
+    public void assignMethod(PaymentMethod method) { this.method = method; }
     public void setId(Long id) { super.setId(new PaymentId(id)); }
 
     // Getters
